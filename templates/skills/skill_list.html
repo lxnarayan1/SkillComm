@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}All Skills - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="bi bi-list-check"></i> All Skills</h1>
+        <p class="lead">Browse all available skills on SkillComm</p>
+    </div>
+</div>
+
+<!-- Category Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-10">
+                <label class="form-label">Filter by Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for value, label in categories %}
+                        <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Skills Grid -->
+<div class="row">
+    {% for skill in skills %}
+    <div class="col-md-4 col-lg-3 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ skill.name }}</h5>
+                <p class="text-muted mb-2">
+                    <span class="badge bg-secondary">{{ skill.get_category_display }}</span>
+                </p>
+                {% if skill.description %}
+                    <p class="card-text small">{{ skill.description|truncatewords:15 }}</p>
+                {% endif %}
+                <hr>
+                <div class="d-flex justify-content-between text-muted small">
+                    <span><i class="bi bi-person-check"></i> {{ skill.get_teachers_count }} teachers</span>
+                    <span><i class="bi bi-mortarboard"></i> {{ skill.get_learners_count }} learners</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No skills found in this category.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

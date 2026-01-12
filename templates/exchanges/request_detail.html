@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Exchange Request - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-arrow-left-right"></i> Exchange Request Details
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <!-- Status Badge -->
+                <div class="text-center mb-4">
+                    <span class="badge badge-lg 
+                        {% if exchange.status == 'pending' %}bg-warning
+                        {% elif exchange.status == 'accepted' %}bg-success
+                        {% elif exchange.status == 'completed' %}bg-info
+                        {% elif exchange.status == 'declined' %}bg-danger
+                        {% else %}bg-secondary{% endif %}" 
+                        style="font-size: 1.2rem; padding: 0.5rem 1rem;">
+                        {{ exchange.get_status_display }}
+                    </span>
+                </div>
+
+                <!-- Participants -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted mb-2">Sender</h6>
+                                <h5>
+                                    <a href="{% url 'accounts:profile' exchange.sender.username %}">
+                                        {{ exchange.sender.get_full_name|default:exchange.sender.username }}
+                                    </a>
+                                </h5>
+                                <p class="text-success mb-0">
+                                    <i class="bi bi-book"></i> Offers: <strong>{{ exchange.skill_offered.name }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted mb-2">Receiver</h6>
+                                <h5>
+                                    <a href="{% url 'accounts:profile' exchange.receiver.username %}">
+                                        {{ exchange.receiver.get_full_name|default:exchange.receiver.username }}
+                                    </a>
+                                </h5>
+                                <p class="text-info mb-0">
+                                    <i class="bi bi-mortarboard"></i> Teaches: <strong>{{ exchange.skill_requested.name }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                {% if exchange.message %}
+                <div class="alert alert-secondary">
+                    <h6><i class="bi bi-chat-left-text"></i> Message from {{ exchange.sender.username }}:</h6>
+                    <p class="mb-0">{{ exchange.message }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Timestamps -->
+                <div class="text-muted small mb-4">
+                    <p class="mb-1"><i class="bi bi-calendar"></i> Created: {{ exchange.created_at|date:"M d, Y - g:i A" }}</p>
+                    <p class="mb-0"><i class="bi bi-clock-history"></i> Last Updated: {{ exchange.updated_at|date:"M d, Y - g:i A" }}</p>
+                </div>
+
+                <!-- Actions -->
+                <hr>
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    {% if exchange.receiver == user and exchange.status == 'pending' %}
+                        <a href="{% url 'exchanges:accept_request' exchange.pk %}" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Accept Request
+                        </a>
+                        <a href="{% url 'exchanges:decline_request' exchange.pk %}" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Decline Request
+                        </a>
+                    {% endif %}
+
+                    {% if exchange.sender == user and exchange.status == 'pending' %}
+                        <a href="{% url 'exchanges:cancel_request' exchange.pk %}" class="btn btn-warning">
+                            <i class="bi bi-x-circle"></i> Cancel Request
+                        </a>
+                    {% endif %}
+
+                    {% if exchange.status == 'accepted' %}
+                        <a href="{% url 'exchanges:complete_request' exchange.pk %}" class="btn btn-info">
+                            <i class="bi bi-check-square"></i> Mark as Completed
+                        </a>
+                    {% endif %}
+
+                    {% if exchange.status == 'completed' %}
+                        <a href="{% url 'reviews:create_review' exchange.pk %}" class="btn btn-primary">
+                            <i class="bi bi-star"></i> Leave a Review
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

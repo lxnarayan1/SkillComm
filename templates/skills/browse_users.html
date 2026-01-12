@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Users - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="bi bi-people"></i> Browse Users</h1>
+        <p class="lead">Find people to exchange skills with</p>
+    </div>
+</div>
+
+<!-- Search and Filter Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Search by name or location</label>
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Enter username or location" 
+                       value="{{ search_query|default:'' }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Can teach</label>
+                <select name="skill_teach" class="form-select">
+                    <option value="">All Skills</option>
+                    {% for skill in all_skills %}
+                        <option value="{{ skill.id }}" {% if selected_skill_teach == skill.id|stringformat:"s" %}selected{% endif %}>
+                            {{ skill.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Wants to learn</label>
+                <select name="skill_learn" class="form-select">
+                    <option value="">All Skills</option>
+                    {% for skill in all_skills %}
+                        <option value="{{ skill.id }}" {% if selected_skill_learn == skill.id|stringformat:"s" %}selected{% endif %}>
+                            {{ skill.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Users List -->
+<div class="row">
+    {% if users %}
+        {% for user in users %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" 
+                                     class="rounded-circle w-100" 
+                                     style="aspect-ratio: 1; object-fit: cover;" 
+                                     alt="{{ user.username }}">
+                            {% else %}
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center w-100" 
+                                     style="aspect-ratio: 1; font-size: 2rem;">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-9">
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'accounts:profile' user.username %}" class="text-decoration-none">
+                                    {{ user.get_full_name|default:user.username }}
+                                </a>
+                            </h5>
+                            <p class="text-muted mb-2">@{{ user.username }}</p>
+                            {% if user.profile.location %}
+                                <p class="mb-2"><i class="bi bi-geo-alt"></i> {{ user.profile.location }}</p>
+                            {% endif %}
+                            <div class="mb-2">
+                                <small class="text-muted">Rating:</small>
+                                <strong>{{ user.profile.get_average_rating|floatformat:1 }}</strong>
+                                <i class="bi bi-star-fill text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-2">
+                        <strong class="text-success">Can teach:</strong><br>
+                        {% if user.profile.skills_to_teach.all %}
+                            {% for skill in user.profile.skills_to_teach.all|slice:":3" %}
+                                <span class="badge bg-success me-1">{{ skill.name }}</span>
+                            {% endfor %}
+                            {% if user.profile.skills_to_teach.count > 3 %}
+                                <span class="badge bg-secondary">+{{ user.profile.skills_to_teach.count|add:"-3" }} more</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">No skills listed</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong class="text-info">Wants to learn:</strong><br>
+                        {% if user.profile.skills_to_learn.all %}
+                            {% for skill in user.profile.skills_to_learn.all|slice:":3" %}
+                                <span class="badge bg-info me-1">{{ skill.name }}</span>
+                            {% endfor %}
+                            {% if user.profile.skills_to_learn.count > 3 %}
+                                <span class="badge bg-secondary">+{{ user.profile.skills_to_learn.count|add:"-3" }} more</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">No skills listed</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'accounts:profile' user.username %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye"></i> View Profile
+                        </a>
+                        <a href="{% url 'exchanges:send_request' user.username %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-arrow-left-right"></i> Send Request
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No users found matching your criteria. Try adjusting your filters.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

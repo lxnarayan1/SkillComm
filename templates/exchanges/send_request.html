@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Send Exchange Request - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-arrow-left-right"></i> 
+                    Send Exchange Request to {{ receiver.username }}
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <!-- User Info -->
+                <div class="alert alert-info">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            {% if receiver.profile.profile_picture %}
+                                <img src="{{ receiver.profile.profile_picture.url }}" 
+                                     class="rounded-circle" 
+                                     style="width: 60px; height: 60px; object-fit: cover;" 
+                                     alt="{{ receiver.username }}">
+                            {% else %}
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                    {{ receiver.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-0">{{ receiver.get_full_name|default:receiver.username }}</h5>
+                            <p class="mb-0 text-muted">@{{ receiver.username }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="text-success">{{ receiver.username }} can teach:</h6>
+                                {% for skill in receiver.profile.skills_to_teach.all %}
+                                    <span class="badge bg-success me-1">{{ skill.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="text-info">You can teach:</h6>
+                                {% for skill in user.profile.skills_to_teach.all %}
+                                    <span class="badge bg-info me-1">{{ skill.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'accounts:profile' receiver.username %}" class="btn btn-secondary">
+                            <i class="bi bi-x"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}My Exchanges - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="bi bi-arrow-left-right"></i> My Exchanges</h1>
+        <p class="lead">View all your exchange requests</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sent Requests -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-send"></i> Requests I Sent</h5>
+            </div>
+            <div class="card-body">
+                {% if sent_requests %}
+                    <div class="list-group">
+                        {% for request in sent_requests %}
+                        <a href="{% url 'exchanges:request_detail' request.pk %}" 
+                           class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">To: {{ request.receiver.username }}</h6>
+                                    <p class="mb-1 small">
+                                        <span class="text-success">{{ request.skill_offered.name }}</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                        <span class="text-info">{{ request.skill_requested.name }}</span>
+                                    </p>
+                                    <small class="text-muted">{{ request.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="badge 
+                                    {% if request.status == 'pending' %}bg-warning
+                                    {% elif request.status == 'accepted' %}bg-success
+                                    {% elif request.status == 'completed' %}bg-info
+                                    {% elif request.status == 'declined' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">You haven't sent any requests yet.</p>
+                    <a href="{% url 'skills:browse_users' %}" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Find Users
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Received Requests -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-inbox"></i> Requests I Received</h5>
+            </div>
+            <div class="card-body">
+                {% if received_requests %}
+                    <div class="list-group">
+                        {% for request in received_requests %}
+                        <a href="{% url 'exchanges:request_detail' request.pk %}" 
+                           class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">From: {{ request.sender.username }}</h6>
+                                    <p class="mb-1 small">
+                                        <span class="text-info">{{ request.skill_requested.name }}</span>
+                                        <i class="bi bi-arrow-left"></i>
+                                        <span class="text-success">{{ request.skill_offered.name }}</span>
+                                    </p>
+                                    <small class="text-muted">{{ request.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="badge 
+                                    {% if request.status == 'pending' %}bg-warning
+                                    {% elif request.status == 'accepted' %}bg-success
+                                    {% elif request.status == 'completed' %}bg-info
+                                    {% elif request.status == 'declined' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">You haven't received any requests yet.</p>
+                    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-success">
+                        <i class="bi bi-pencil"></i> Complete Your Profile
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

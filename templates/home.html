@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row align-items-center">
+    <div class="col-md-6">
+        <h1 class="display-4 mb-4">Exchange Skills, Grow Together</h1>
+        <p class="lead mb-4">
+            Connect with people who want to learn what you know, and teach you what they know. 
+            No money involved, just pure skill exchange!
+        </p>
+        {% if not user.is_authenticated %}
+        <div>
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg me-2">Get Started</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+        </div>
+        {% else %}
+        <div>
+            <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary btn-lg me-2">Go to Dashboard</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600" 
+             class="img-fluid rounded shadow" alt="People collaborating">
+    </div>
+</div>
+
+<div class="row mt-5 pt-5">
+    <div class="col-md-4 text-center mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-person-check display-4 text-primary mb-3"></i>
+                <h3>Find Your Match</h3>
+                <p>Browse profiles of people with skills you want to learn, and who want to learn from you.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-center mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-arrow-left-right display-4 text-primary mb-3"></i>
+                <h3>Exchange Skills</h3>
+                <p>Send exchange requests and start learning from each other in a mutually beneficial way.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-center mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-graph-up display-4 text-primary mb-3"></i>
+                <h3>Track Progress</h3>
+                <p>Rate your exchanges, build your reputation, and grow your skill set continuously.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

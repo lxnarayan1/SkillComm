@@ -1,0 +1,219 @@
+{% comment %} {% extends 'base.html' %}
+
+{% block title %}Dashboard - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
+        <p class="lead">Manage your skill exchanges and connections</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Total Exchanges</h5>
+                <p class="display-4">{{ user.profile.get_total_exchanges }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Average Rating</h5>
+                <p class="display-4">{{ user.profile.get_average_rating|floatformat:1 }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Pending Requests</h5>
+                <p class="display-4">{{ pending_received }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-send"></i> Requests You Sent</h5>
+            </div>
+            <div class="card-body">
+                {% if sent_requests %}
+                    <div class="list-group">
+                        {% for request in sent_requests %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">To: {{ request.receiver.username }}</h6>
+                                    <small>{{ request.skill_offered.name }} → {{ request.skill_requested.name }}</small>
+                                </div>
+                                <span class="badge bg-{{ request.status|yesno:'success,warning,secondary' }}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No requests sent yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-inbox"></i> Requests You Received</h5>
+            </div>
+            <div class="card-body">
+                {% if received_requests %}
+                    <div class="list-group">
+                        {% for request in received_requests %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">From: {{ request.sender.username }}</h6>
+                                    <small>{{ request.skill_requested.name }} ← {{ request.skill_offered.name }}</small>
+                                </div>
+                                <span class="badge bg-{{ request.status|yesno:'success,warning,secondary' }}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No requests received yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-lightbulb"></i> 
+            <strong>Quick Tip:</strong> Complete your profile with skills you can teach and want to learn to get better matches!
+            <a href="{% url 'accounts:profile_edit' %}" class="alert-link">Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SkillComm{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
+        <p class="lead">Manage your skill exchanges and connections</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Total Exchanges</h5>
+                <p class="display-4">{{ user.profile.get_total_exchanges }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Average Rating</h5>
+                <p class="display-4">{{ user.profile.get_average_rating|floatformat:1 }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Pending Requests</h5>
+                <p class="display-4">{{ pending_received }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-send"></i> Requests You Sent</h5>
+            </div>
+            <div class="card-body">
+                {% if sent_requests %}
+                    <div class="list-group">
+                        {% for request in sent_requests %}
+                        <a href="{% url 'exchanges:request_detail' request.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">To: {{ request.receiver.username }}</h6>
+                                    <small>{{ request.skill_offered.name }} → {{ request.skill_requested.name }}</small>
+                                </div>
+                                <span class="badge bg-{{ request.status|yesno:'success,warning,secondary' }}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No requests sent yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-inbox"></i> Requests You Received</h5>
+            </div>
+            <div class="card-body">
+                {% if received_requests %}
+                    <div class="list-group">
+                        {% for request in received_requests %}
+                        <a href="{% url 'exchanges:request_detail' request.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">From: {{ request.sender.username }}</h6>
+                                    <small>{{ request.skill_requested.name }} ← {{ request.skill_offered.name }}</small>
+                                </div>
+                                <span class="badge bg-{{ request.status|yesno:'success,warning,secondary' }}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No requests received yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-lightbulb"></i> 
+            <strong>Quick Tip:</strong> Complete your profile with skills you can teach and want to learn to get better matches!
+            <a href="{% url 'accounts:profile_edit' %}" class="alert-link">Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
