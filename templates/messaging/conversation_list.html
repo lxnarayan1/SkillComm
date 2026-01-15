@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - SkillSwap{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="bi bi-chat-dots"></i> My Messages</h1>
+        <p class="lead">Conversations with your exchange partners</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% if conversations %}
+            <div class="list-group">
+                {% for conv in conversations %}
+                <a href="{% url 'messaging:conversation_detail' conv.exchange.id %}" 
+                   class="list-group-item list-group-item-action {% if conv.unread_count > 0 %}list-group-item-warning{% endif %}">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0">
+                                    {% if conv.exchange.sender == user %}
+                                        <i class="bi bi-person"></i> {{ conv.exchange.receiver.username }}
+                                    {% else %}
+                                        <i class="bi bi-person"></i> {{ conv.exchange.sender.username }}
+                                    {% endif %}
+                                    {% if conv.unread_count > 0 %}
+                                        <span class="badge bg-warning text-dark">{{ conv.unread_count }} new</span>
+                                    {% endif %}
+                                </h5>
+                            </div>
+                            <p class="mb-1 text-muted small">
+                                <strong>Exchange:</strong> 
+                                {{ conv.exchange.skill_offered.name }} ⇄ {{ conv.exchange.skill_requested.name }}
+                            </p>
+                            {% if conv.last_message %}
+                                <p class="mb-0 small">
+                                    <strong>{{ conv.last_message.sender.username }}:</strong> 
+                                    {{ conv.last_message.content|truncatewords:10 }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-end">
+                            {% if conv.last_message %}
+                                <small class="text-muted">
+                                    {{ conv.last_message.created_at|timesince }} ago
+                                </small>
+                            {% endif %}
+                            <br>
+                            <span class="badge bg-{{ conv.exchange.status|yesno:'info,success' }}">
+                                {{ conv.exchange.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> 
+                No active conversations yet. Accept an exchange request to start messaging!
+            </div>
+            <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Go to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

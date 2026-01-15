@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Exchange Request - SkillComm{% endblock %}
+{% block title %}Exchange Request - SkillSwap{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -92,7 +92,10 @@
                     {% endif %}
 
                     {% if exchange.status == 'accepted' %}
-                        <a href="{% url 'exchanges:complete_request' exchange.pk %}" class="btn btn-info">
+                        <a href="{% url 'messaging:conversation_detail' exchange.id %}" class="btn btn-info">
+                            <i class="bi bi-chat-dots"></i> Send Message
+                        </a>
+                        <a href="{% url 'exchanges:complete_request' exchange.pk %}" class="btn btn-success">
                             <i class="bi bi-check-square"></i> Mark as Completed
                         </a>
                     {% endif %}

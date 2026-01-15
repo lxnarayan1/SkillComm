@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if is_edit %}Edit Review{% else %}Leave Review{% endif %} - SkillSwap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">
+                    <i class="bi bi-star"></i> 
+                    {% if is_edit %}
+                        Edit Your Review
+                    {% else %}
+                        Leave a Review for {{ reviewed_user.username }}
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                {% if not is_edit %}
+                <!-- Exchange Info -->
+                <div class="alert alert-info">
+                    <h6>Exchange Details:</h6>
+                    <p class="mb-1">
+                        <strong>Skills Exchanged:</strong> 
+                        {{ exchange.skill_offered.name }} ⇄ {{ exchange.skill_requested.name }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>With:</strong> 
+                        {{ reviewed_user.get_full_name|default:reviewed_user.username }} 
+                        (@{{ reviewed_user.username }})
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Review Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label"><strong>How was your experience?</strong></label>
+                        <div class="rating-options">
+                            {{ form.rating }}
+                        </div>
+                    </div>
+                    
+                    {{ form.comment|as_crispy_field }}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        {% if is_edit %}
+                            <a href="{% url 'accounts:profile' review.reviewed_user.username %}" class="btn btn-secondary">
+                                <i class="bi bi-x"></i> Cancel
+                            </a>
+                        {% else %}
+                            <a href="{% url 'exchanges:request_detail' exchange.id %}" class="btn btn-secondary">
+                                <i class="bi bi-x"></i> Cancel
+                            </a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-star-fill"></i> 
+                            {% if is_edit %}Update Review{% else %}Submit Review{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating-options .form-check {
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .rating-options .form-check:hover {
+        background-color: #f8f9fa;
+        border-color: #ffc107;
+    }
+    .rating-options .form-check-input:checked + .form-check-label {
+        color: #ffc107;
+        font-weight: bold;
+    }
+    .rating-options .form-check-input {
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}

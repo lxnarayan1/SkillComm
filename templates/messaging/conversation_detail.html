@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Conversation - SkillSwap{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <a href="{% url 'messaging:conversation_list' %}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Messages
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Conversation Header -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-0">
+                            <i class="bi bi-chat-dots"></i> 
+                            Conversation with {{ other_user.get_full_name|default:other_user.username }}
+                        </h5>
+                        <small>
+                            Exchange: {{ exchange.skill_offered.name }} ⇄ {{ exchange.skill_requested.name }}
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{% url 'exchanges:request_detail' exchange.id %}" class="btn btn-sm btn-light">
+                            <i class="bi bi-info-circle"></i> View Exchange
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="card shadow-sm mb-3" style="height: 500px; overflow-y: auto;" id="messageContainer">
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="mb-3 {% if message.sender == user %}text-end{% endif %}">
+                        <div class="d-inline-block" style="max-width: 70%;">
+                            <div class="card {% if message.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                <div class="card-body p-2">
+                                    <small class="d-block mb-1">
+                                        <strong>{{ message.sender.username }}</strong>
+                                    </small>
+                                    <p class="mb-1">{{ message.content }}</p>
+                                    <small class="text-{% if message.sender == user %}light{% else %}muted{% endif %}">
+                                        {{ message.created_at|date:"M d, g:i A" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-chat-left-dots" style="font-size: 3rem;"></i>
+                        <p class="mt-3">No messages yet. Start the conversation!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Message Input Form -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" id="messageForm">
+                    {% csrf_token %}
+                    <div class="row g-2">
+                        <div class="col-md-10">
+                            {{ form.content }}
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100 h-100">
+                                <i class="bi bi-send"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-scroll to bottom of messages
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('messageContainer');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    });
+    
+    // Scroll to bottom after sending message
+    document.getElementById('messageForm').addEventListener('submit', function() {
+        setTimeout(function() {
+            const container = document.getElementById('messageContainer');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }, 100);
+    });
+</script>
+{% endblock %}
